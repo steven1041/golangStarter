@@ -11,6 +11,10 @@ import (
 	"golangStarter/models"
 )
 
+func WxRegister(c *gin.Context) {
+
+}
+
 // SignUpHandler 处理注册请求
 func SignUpHandler(c *gin.Context) {
 	//1.获取参数,参数校验

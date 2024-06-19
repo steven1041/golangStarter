@@ -26,21 +26,6 @@ import (
 	"golangStarter/settings"
 )
 
-// @title bluebell项目接口文档
-// @version 1.0
-// @description Go web开发进阶项目实战课程bluebell
-// @termsOfService http://swagger.io/terms/
-
-// @contact.name stone
-// @contact.url http://www.swagger.io/support
-// @contact.email support@swagger.io
-
-// @license.name Apache 2.0
-// @license.url http://www.apache.org/licenses/LICENSE-2.0.html
-
-// @host 127.0.0.1:8080
-// @BasePath /api/vi
-
 // Golang Web开发通用的脚手架
 var (
 	configPath string
