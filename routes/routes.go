@@ -6,7 +6,6 @@ import (
 
 	"github.com/gin-gonic/gin"
 	gs "github.com/swaggo/gin-swagger"
-	"golangStarter/controller"
 	"golangStarter/logger"
 	"golangStarter/middlewares"
 	"net/http"
@@ -19,8 +18,7 @@ func SetUp() *gin.Engine {
 	r.GET("/swagger/*any", gs.WrapHandler(swaggerFiles.Handler))
 
 	v1 := r.Group("/api/v1")
-	v1.POST("/signup", controller.SignUpHandler)
-	v1.POST("/login", controller.LoginHandler)
+
 	v1.Use(middlewares.JWTAuthMiddleware())
 	{
 
