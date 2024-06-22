@@ -24,3 +24,9 @@ redis:
   password: ""
   db: 0
   pool_size: 10
+wechat:
+   url: "https://api.weixin.qq.com/sns/jscode2session?"
+   app_id: "wx6f9cc63ed9ded89b"
+   secret: "421169661fc3ef99110fe20c75a64ad1"
+   http_tail: "&grant_type=authorization_code"
+

@@ -8,15 +8,16 @@ import (
 )
 
 type AppConfig struct {
-	Name         string `mapstructure:"name"`
-	Mode         string `mapstructure:"mode"`
-	Version      string `mapstructure:"version"`
-	Port         int    `mapstructure:"port"`
-	StartTime    string `mapstructure:"start_time"`
-	MachineID    int64  `mapstructure:"machine_id"`
-	*LogConfig   `mapstructure:"log"`
-	*MysqlConfig `mapstructure:"mysql"`
-	*RedisConfig `mapstructure:"redis"`
+	Name          string `mapstructure:"name"`
+	Mode          string `mapstructure:"mode"`
+	Version       string `mapstructure:"version"`
+	Port          int    `mapstructure:"port"`
+	StartTime     string `mapstructure:"start_time"`
+	MachineID     int64  `mapstructure:"machine_id"`
+	*LogConfig    `mapstructure:"log"`
+	*MysqlConfig  `mapstructure:"mysql"`
+	*RedisConfig  `mapstructure:"redis"`
+	*WeChatConfig `mapstructure:"wechat"`
 }
 
 type LogConfig struct {
@@ -43,6 +44,13 @@ type RedisConfig struct {
 	Port     int    `mapstructure:"port"`
 	DB       int    `mapstructure:"db"`
 	PoolSize int    `mapstructure:"pool_size"`
+}
+
+type WeChatConfig struct {
+	Url      string `mapstructure:"url"`
+	AppId    string `mapstructure:"app_id"`
+	Secret   string `mapstructure:"secret"`
+	HttpTail string `mapstructure:"http_tail"`
 }
 
 var Conf = new(AppConfig)

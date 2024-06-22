@@ -6,22 +6,22 @@ import (
 	"time"
 )
 
-const TokenExpireDuration = time.Hour * 24 * 365
+const TokenExpireDuration = time.Hour * 24
 
 var mySecret = []byte("夏天夏天悄悄的过去")
 
 // MyClaims jwt包的jwt.StandardClaims只包含了官方字段
 // 如果想要保存更多的信息，都可以添加到这个结构体中
 type MyClaims struct {
-	UserID   int64  `json:"user_id"`
+	Openid   string `json:"openid"`
 	Username string `json:"username"`
 	jwt.StandardClaims
 }
 
 // GenToken 生成token
-func GenToken(userID int64, username string) (string, error) {
+func GenToken(openId string, username string) (string, error) {
 	c := MyClaims{
-		userID,
+		openId,
 		username,
 		jwt.StandardClaims{
 			ExpiresAt: time.Now().Add(TokenExpireDuration).Unix(),

@@ -2,7 +2,6 @@ package mysql
 
 import (
 	"crypto/md5"
-	"database/sql"
 	"encoding/hex"
 	"golangStarter/models"
 )
@@ -10,27 +9,18 @@ import (
 // 把每一步数据库操作封装成函数,被Logic层根据业务需求来调用
 const secret = "stone.com"
 
-// CheckUserExit 检查用户是滞存在
-func CheckUserExit(username string) (err error) {
-	sqlStr := `select count(user_id) from user where username =?`
+// CheckWxUserExit  检查微信用户是否存在
+func CheckWxUserExit(openid string) (any interface{}) {
+	sqlStr := `select count(openid) from user where openid =?`
 	var count int
-	if err = db.Get(&count, sqlStr, username); err != nil {
+	if err := db.Get(&count, sqlStr, openid); err != nil {
 		return err
 	}
 	if count > 0 {
-		return ErrorUserExist
+		return true
+	} else {
+		return false
 	}
-	return
-}
-
-// InsertUser 向数据库插入一条新的用户记录
-func InsertUser(user *models.User) (err error) {
-	//对密码进行加密
-	password := encryptPassword(user.Password)
-	//执行SQL语句入库
-	sqlStr := `insert into user(user_id,username,password) values (?,?,?)`
-	_, err = db.Exec(sqlStr, user.UserID, user.UserName, password)
-	return
 
 }
 
@@ -40,28 +30,22 @@ func encryptPassword(oPassword string) string {
 	return hex.EncodeToString(h.Sum([]byte(oPassword)))
 }
 
-func Login(user *models.User) (err error) {
-	oPassword := user.Password
-	sqlStr := `select user_id,username,password from user where username=?`
-	err = db.Get(user, sqlStr, user.UserName)
-	if err == sql.ErrNoRows {
-		return ErrorUserNotExist
-	}
-	if err != nil {
-		//查询数据库失败
+func MiniProgrammerLogin(user *models.WxUser) (err error) {
+	// 检查openID是否存在
+	result := CheckWxUserExit(user.OpenID)
+	err, ok := result.(error)
+	if ok {
 		return err
 	}
-	//判断密码是否正确
-	password := encryptPassword(oPassword)
-	if password != user.Password {
-		return ErrorInvalidPassword
+	//如查存在,直接更新数据库
+	isExit, _ := result.(bool)
+	if isExit {
+		sqlStr := `UPDATE user SET nickname=?,SET avatar=?,SET gender=?,SET country=?,SET province=?,SET city=?,SET language=? WHERE openid=?`
+		_, err = db.Exec(sqlStr, user.NickName, user.Avatar, user.Gender, user.Country, user.Province, user.City, user.Language, user.OpenID)
+	} else { //如果不存在，插入数据库
+		sqlStr := `insert into user (open_id,nickname,avatar,gender,country,province,city,language) values (?,?,?,?,?,?,?,?)`
+		_, err = db.Exec(sqlStr, user.OpenID, user.NickName, user.Avatar, user.Gender, user.Country, user.Province, user.City, user.Language)
+		return
 	}
-	return
-}
-
-func GetUserById(userId int64) (user *models.User, err error) {
-	user = new(models.User)
-	sqlStr := "select user_id,username from user where user_id=?"
-	err = db.Get(user, sqlStr, userId)
 	return
 }

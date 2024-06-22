@@ -4,37 +4,41 @@ import (
 	"golangStarter/dao/mysql"
 	"golangStarter/models"
 	"golangStarter/pkg/jwt"
-	"golangStarter/pkg/snowflake"
+	"golangStarter/pkg/wechat"
 )
 
-func SignUp(p *models.ParamSignUp) (err error) {
-	//1.判断用户是否存在
-	err = mysql.CheckUserExit(p.Username)
-	if err != nil {
-		return err
-	}
-	//2.生成UID
-	userID := snowflake.GenID()
-	user := &models.User{
-		UserID:   userID,
-		UserName: p.Username,
-		Password: p.Password,
-	}
-	//3.保存进数据库
-	return mysql.InsertUser(user)
+type Code2Session struct {
+	ErrCode    int32  `json:"err_code"`    // 错误码
+	ErrMsg     string `json:"err_msg"`     // 错误信息
+	Openid     string `json:"openid"`      // 用户唯一标识
+	SessionKey string `json:"session_key"` // 会话密钥
 }
 
-func Login(p *models.ParamLogin) (user *models.User, err error) {
-	user = &models.User{
-		UserName: p.Username,
-		Password: p.Password,
+func MiniProgrammerLogin(p *models.ParamMiniProgrammerLogin) (user *models.WxUser, err error) {
+	user = &models.WxUser{
+		NickName: p.NickName,
+		Avatar:   p.Avatar,
+		Gender:   p.Gender,
+		Country:  p.Country,
+		Province: p.Province,
+		City:     p.City,
+		Language: p.Language,
 	}
-	//传递的是指针，就能拿到user.UserID
-	if err := mysql.Login(user); err != nil {
+
+	wechatProxy := &wechat.WeChat{}
+	snsOauth2, err := wechatProxy.GetWxOpenIdFromOauth2(p.Code)
+	if err != nil {
+		return nil, err
+	}
+	if len(snsOauth2.Openid) == 0 {
+		return nil, ErrorOpenidNil
+	}
+	user.OpenID = snsOauth2.Openid
+	if err := mysql.MiniProgrammerLogin(user); err != nil {
 		return nil, err
 	}
 	//生成JWT
-	token, err := jwt.GenToken(user.UserID, user.UserName)
+	token, err := jwt.GenToken(user.OpenID, user.NickName)
 	if err != nil {
 		return
 	}

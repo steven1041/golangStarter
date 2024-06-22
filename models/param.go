@@ -18,18 +18,13 @@ type ParamLogin struct {
 	Password string `json:"password" binding:"required"`
 }
 
-type ParamMiniProgrammerRegister struct {
-	Code      string `json:"code"`
-	NickName  string `json:"nickName"`
-	Gender    int    `json:"gender"`
-	City      string `json:"city"`
-	Province  string `json:"province"`
-	Country   string `json:"country"`
-	AvatarUrl string `json:"avatarUrl"`
-	/**
-	put custom code here
-	e.g.
-		Email			string		`json:"email" binding:"required"`
-		Password 		string		`json:"password" binding:"required"`
-	*/
+type ParamMiniProgrammerLogin struct {
+	Code     string `json:"code"`
+	NickName string `json:"nickname"`
+	Avatar   string `json:"avatar"`
+	Gender   string `json:"gender"`
+	City     string `json:"city"`
+	Province string `json:"province"`
+	Country  string `json:"country"`
+	Language string `json:"language"`
 }
