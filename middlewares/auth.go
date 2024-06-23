@@ -3,6 +3,7 @@ package middlewares
 import (
 	"github.com/gin-gonic/gin"
 	"golangStarter/controller"
+	"golangStarter/dao/redis"
 	"golangStarter/pkg/jwt"
 	"strings"
 )
@@ -27,14 +28,20 @@ func JWTAuthMiddleware() func(c *gin.Context) {
 			c.Abort()
 			return
 		}
+
 		//parts[1]是获取到的token,我们使用之前定义好的解析JWT函数来解析它
 		mc, err := jwt.ParseToken(parts[1])
 		if err != nil {
 			controller.ResponseError(c, controller.CodeInvalidToken)
 			c.Abort()
 		}
-		//将当前请求的user_id信息保存到请求的上下文c上
-		c.Set(controller.CtxUserIDKey, mc.UserID)
+		if redis.CheckToken(mc.Openid, parts[1]) == false {
+			controller.ResponseError(c, controller.CodeInvalidToken)
+			c.Abort()
+		}
+
+		//将当前请求的open_id信息保存到请求的上下文c上
+		c.Set(controller.CtxWxOpenIDKey, mc.Openid)
 		c.Next()
 	}
 }

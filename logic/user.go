@@ -2,6 +2,7 @@ package logic
 
 import (
 	"golangStarter/dao/mysql"
+	"golangStarter/dao/redis"
 	"golangStarter/models"
 	"golangStarter/pkg/jwt"
 	"golangStarter/pkg/wechat"
@@ -34,7 +35,7 @@ func MiniProgrammerLogin(p *models.ParamMiniProgrammerLogin) (user *models.WxUse
 		return nil, ErrorOpenidNil
 	}
 	user.OpenID = snsOauth2.Openid
-	if err := mysql.MiniProgrammerLogin(user); err != nil {
+	if err = mysql.MiniProgrammerLogin(user); err != nil {
 		return nil, err
 	}
 	//生成JWT
@@ -43,5 +44,9 @@ func MiniProgrammerLogin(p *models.ParamMiniProgrammerLogin) (user *models.WxUse
 		return
 	}
 	user.Token = token
+	err = redis.SetToken(user.OpenID, token)
+	if err != nil {
+		return nil, err
+	}
 	return
 }

@@ -7,6 +7,7 @@ import (
 )
 
 const CtxUserIDKey = "UserID"
+const CtxWxOpenIDKey = "WxOpenID"
 
 var ErrorUserNotLogin = errors.New("用户未登录")
 
